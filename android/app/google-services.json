@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "790271953981",
+    "firebase_url": "https://home-of-food.firebaseio.com",
+    "project_id": "home-of-food",
+    "storage_bucket": "home-of-food.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790271953981:android:74d555601d55e5b9c76e54",
+        "android_client_info": {
+          "package_name": "com.progx.home_of_food"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "790271953981-p439t0pceqo3e2govlflfm9el7fau2n7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt--lunplaODHJRpZe7GxYuoHHv950c0c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "790271953981-p439t0pceqo3e2govlflfm9el7fau2n7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
