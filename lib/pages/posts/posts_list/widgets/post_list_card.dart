@@ -3,6 +3,7 @@ import 'package:home_of_food/data/Palette.dart';
 import 'package:home_of_food/models/post.dart';
 import 'package:home_of_food/models/shared/main_model.dart';
 import 'package:home_of_food/pages/food_item/food_item.dart';
+import 'package:home_of_food/pages/profile/profile.dart';
 import 'package:home_of_food/widgets/divider.dart';
 import 'package:provider/provider.dart';
 
@@ -99,18 +100,6 @@ class PostListCard extends StatelessWidget {
                             ),
                           ),
                         ),
-
-                        //  ClipOval(
-                        //   // TODO hanel ofline
-                        //   child: Image.network(
-                        // 'https://firebasestorage.googleapis.com/v0/b/home-of-food.appspot.com/o/food_imges%2F' +
-                        //     imagePath.split('/')[imagePath.split('/').length - 1] +
-                        //     '?alt=media',
-                        //     width: 60,
-                        //     fit: BoxFit.cover,
-
-                        //   ),
-                        // ),
                       ),
                     ],
                   ),
@@ -133,10 +122,6 @@ class PostListCard extends StatelessWidget {
                                       size: 35,
                                     ),
                           onTap: () {
-                            //TODO add remove liked post
-                            // post.likedList.add(model.currentUser.userUID);
-                            // print(model.posts);
-                            // print(post.likedList);
                             post.likedList.contains(model.currentUser.userUID)
                                 ? model.removeFavorite(
                                     postID: post.postID,
@@ -166,20 +151,37 @@ class PostListCard extends StatelessWidget {
               ),
             ),
             Positioned(
-                top: 6,
-                left: 35,
+              top: 6,
+              left: 35,
+              child: GestureDetector(
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 3.0),
                   color: Colors.white,
                   child: Text(
-                    // TODO show user profile
                     post.userName,
                     style: TextStyle(
                         color: black,
                         fontSize: 20,
                         fontWeight: FontWeight.w900),
                   ),
-                ))
+                ),
+                onTap: () {
+                  model.getProfilePosts(userUID: post.userUID);
+                  model.getFBLink(post.userUID);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => ProfilePage(
+                        myProfile: model.currentUser.userUID == post.userUID
+                            ? true
+                            : false,
+                        title: post.userName,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
         onTap: () {

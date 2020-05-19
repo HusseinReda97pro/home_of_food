@@ -9,6 +9,8 @@ class PostList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+        shrinkWrap: true,
+        physics: ClampingScrollPhysics(),
         itemCount: posts.length,
         itemBuilder: (context, index) {
           return PostListCard(

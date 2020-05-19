@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:home_of_food/models/user.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 mixin UserModel on ChangeNotifier {
   User currentUser;
   bool signingup = false;
   bool logingin = false;
   final _auth = FirebaseAuth.instance;
+  String anotherUserfbLink;
 
   Future<String> signUp(email, password, userName, fbLink) async {
     signingup = true;
@@ -18,10 +23,6 @@ mixin UserModel on ChangeNotifier {
       var userUID;
       final newUser = await _auth.createUserWithEmailAndPassword(
           email: email.trim(), password: password);
-      // if(newUser == 'ERROR_WEAK_PASSWORD'){
-
-      // }
-      print(newUser);
       if (newUser != null) {
         userUID = newUser.user.uid;
         FirebaseDatabase database = FirebaseDatabase.instance;
@@ -152,5 +153,198 @@ mixin UserModel on ChangeNotifier {
     prefs.remove('userUID');
     prefs.remove('userName');
     prefs.remove('fbLink');
+  }
+
+  // Facebook signup
+  Future<String> signupWithFB() async {
+    String message;
+    signingup = true;
+    notifyListeners();
+    final facebookLogin = FacebookLogin();
+    final result = await facebookLogin.logIn(['email']);
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        try {
+          final token = result.accessToken.token;
+          final graphResponse = await http.get(
+              'https://graph.facebook.com/v2.12/me?fields=name,picture,email&access_token=$token');
+          final profile = json.decode(graphResponse.body);
+          final facebookAuthCred =
+              FacebookAuthProvider.getCredential(accessToken: token);
+          var user = (await _auth.signInWithCredential(facebookAuthCred)).user;
+          FirebaseDatabase database = FirebaseDatabase.instance;
+          Map<String, String> userData = {
+            'userName': profile['name'],
+            'fbLink': null
+          };
+          database.reference().child('users').child(user.uid).set(userData);
+          socialLogin(userUID: user.uid, email: user.email);
+          message = 'successfully';
+        } catch (error) {
+          switch (error.code) {
+            case 'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL':
+              message = 'الأيميل المستخدم لحساب الفيس بوك مسجل بالفعل!';
+              break;
+          }
+        }
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        message = 'لقد قمت برفض الدخول عن طريق الفيس بوك';
+        break;
+      case FacebookLoginStatus.error:
+        message = 'حدث خطأ غير معروف';
+        break;
+    }
+    signingup = false;
+    notifyListeners();
+    return message;
+  }
+
+  // Facebook login
+  Future<String> loginWithFB() async {
+    String message;
+    logingin = true;
+    notifyListeners();
+    final facebookLogin = FacebookLogin();
+    final result = await facebookLogin.logIn(['email']);
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        try {
+          final token = result.accessToken.token;
+          final facebookAuthCred =
+              FacebookAuthProvider.getCredential(accessToken: token);
+          var user = (await _auth.signInWithCredential(facebookAuthCred)).user;
+          socialLogin(userUID: user.uid, email: user.email);
+          message = 'successfully';
+        } catch (error) {
+          switch (error.code) {
+            case 'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL':
+              message = 'الأيميل المستخدم لحساب الفيس بوك مسجل بالفعل!';
+              break;
+          }
+        }
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        message = 'لقد قمت برفض الدخول عن طريق الفيس بوك';
+        break;
+      case FacebookLoginStatus.error:
+        message = 'حدث خطأ غير معروف';
+        break;
+    }
+    logingin = false;
+    notifyListeners();
+    return message;
+  }
+
+// google signup
+  Future<String> googleSignup() async {
+    signingup = true;
+    notifyListeners();
+    String message;
+    try {
+      GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential googleAuthCred = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      var user = (await _auth.signInWithCredential(googleAuthCred)).user;
+      FirebaseDatabase database = FirebaseDatabase.instance;
+      Map<String, String> userData = {
+        'userName': user.displayName,
+        'fbLink': null
+      };
+      database.reference().child('users').child(user.uid).set(userData);
+      socialLogin(userUID: user.uid, email: user.email);
+      message = 'successfully';
+    } catch (error) {
+      message = 'حدث خطأ غير معروف';
+    }
+    signingup = false;
+    notifyListeners();
+    return message;
+  }
+
+  // google login
+  Future<String> googleLogin() async {
+    logingin = true;
+    notifyListeners();
+    String message;
+    try {
+      GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential googleAuthCred = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      var user = (await _auth.signInWithCredential(googleAuthCred)).user;
+      socialLogin(userUID: user.uid, email: user.email);
+      message = 'successfully';
+    } catch (error) {
+      message = 'حدث خطأ غير معروف';
+      // message = error.toString();
+    }
+    logingin = false;
+    notifyListeners();
+    return message;
+  }
+
+// login for google and facebook to save user data in shared prefrances and modle
+  socialLogin({@required userUID, @required email}) async {
+    String userName, fbLink;
+    var db =
+        FirebaseDatabase.instance.reference().child("users").child(userUID);
+    await db.once().then((DataSnapshot snapshot) {
+      Map<dynamic, dynamic> values = snapshot.value;
+      userName = values['userName'];
+      fbLink = values['fbLink'];
+    });
+    currentUser = User(
+        userUID: userUID, email: email, userName: userName, fbLink: fbLink);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("userEmail", email);
+    prefs.setString("userUID", userUID);
+    prefs.setString("userName", userName);
+    prefs.setString("fbLink", fbLink);
+  }
+
+  Future<bool> addFBLink(link) async {
+    try {
+      FirebaseDatabase database = FirebaseDatabase.instance;
+      await database
+          .reference()
+          .child('users')
+          .child(currentUser.userUID)
+          .child('fbLink')
+          .set(link);
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("fbLink", link);
+      currentUser.fbLink = link;
+      notifyListeners();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> getFBLink(userUID) async {
+    String fbLink;
+    try {
+      var db = FirebaseDatabase.instance
+          .reference()
+          .child('users')
+          .child(userUID);
+      await db.once().then((DataSnapshot snapshot) {
+        Map<dynamic, dynamic> values = snapshot.value;
+        fbLink = values['fbLink'];
+      });
+      anotherUserfbLink = fbLink;
+      notifyListeners();
+    } catch (_) {
+      return null;
+    }
   }
 }

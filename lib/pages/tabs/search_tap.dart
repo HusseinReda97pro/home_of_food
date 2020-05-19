@@ -6,6 +6,7 @@ import 'package:home_of_food/data/kitchens.dart';
 import 'package:home_of_food/models/food_item.dart';
 import 'package:home_of_food/pages/food_list/widgets/food_list_card.dart';
 import 'package:home_of_food/widgets/divider.dart';
+import 'package:home_of_food/widgets/ensure_visible.dart.dart';
 
 class SearchTab extends StatefulWidget {
   @override
@@ -21,7 +22,7 @@ class SearchTabState extends State<SearchTab> {
   List<FoodItem> foodList = [];
   bool searching = true;
   bool noRusluts = true;
-  
+  final FocusNode focusNode = FocusNode();
 
   Future<bool> search(String title, kitchen, category) async {
     var categoryItems;
@@ -114,25 +115,29 @@ class SearchTabState extends State<SearchTab> {
         margin: EdgeInsets.symmetric(
             horizontal: MediaQuery.of(context).size.width * 0.01,
             vertical: 15.0),
-        child: TextField(
-          controller: searchController,
-          decoration: InputDecoration(
-            suffix: Container(
-              margin: EdgeInsets.only(left: 5.0),
-              child: Icon(
-                Icons.search,
-                size: 20,
-                color: lightBlue,
+        child: EnsureVisibleWhenFocused(
+          focusNode: focusNode,
+          child: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              suffix: Container(
+                margin: EdgeInsets.only(left: 5.0),
+                child: Icon(
+                  Icons.search,
+                  size: 20,
+                  color: lightBlue,
+                ),
               ),
-            ),
-            hintText: 'عن ماذا تبحث؟',
-            hintStyle: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w900, color: black),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(50),
-              borderSide: BorderSide(
-                width: 0,
-                style: BorderStyle.solid,
+              hintText: 'عن ماذا تبحث؟',
+              hintStyle: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.w900, color: black),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(50),
+                borderSide: BorderSide(
+                  color: pink,
+                  width: 0,
+                  style: BorderStyle.solid,
+                ),
               ),
             ),
           ),
@@ -143,111 +148,116 @@ class SearchTabState extends State<SearchTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          searchText(context),
-          Row(
-            children: <Widget>[
-              RaisedButton(
-                color: blue,
-                shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(18.0),
-                    side: BorderSide(color: black)),
-                child: Container(
-                  height: 25,
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      iconEnabledColor: pink,
-                      iconSize: 30,
-                      style: TextStyle(
-                          color: black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900),
-                      value: selectedCategory,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedCategory = value;
-                        });
-                      },
-                      items: categories
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Container(
+        child: Column(
+          children: <Widget>[
+            searchText(context),
+            Row(
+              children: <Widget>[
+                RaisedButton(
+                  color: blue,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(18.0),
+                      side: BorderSide(color: black)),
+                  child: Container(
+                    height: 25,
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        iconEnabledColor: pink,
+                        iconSize: 30,
+                        style: TextStyle(
+                            color: black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900),
+                        value: selectedCategory,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedCategory = value;
+                          });
+                        },
+                        items: categories
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
+                  onPressed: () {},
                 ),
-                onPressed: () {},
-              ),
-              SizedBox(
-                width: 3.0,
-              ),
-              RaisedButton(
-                color: blue,
-                shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(18.0),
-                    side: BorderSide(color: black)),
-                child: Container(
-                  height: 25,
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      iconEnabledColor: pink,
-                      iconSize: 30,
-                      style: TextStyle(
-                          color: black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900),
-                      value: selectedKitchen,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedKitchen = value;
-                        });
-                      },
-                      items: kitchens
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                SizedBox(
+                  width: 3.0,
+                ),
+                RaisedButton(
+                  color: blue,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(18.0),
+                      side: BorderSide(color: black)),
+                  child: Container(
+                    height: 25,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        iconEnabledColor: pink,
+                        iconSize: 30,
+                        style: TextStyle(
+                            color: black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900),
+                        value: selectedKitchen,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedKitchen = value;
+                          });
+                        },
+                        items: kitchens
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
+                  onPressed: () {},
                 ),
-                onPressed: () {},
-              ),
-            ],
-          ),
-          DividerV2(),
-          noRusluts
-              ? Text(
-                  'لا توجد نتائج للبحث',
-                  style: TextStyle(fontSize: 16, color: black),
-                )
-              : searching
-                  ? CircularProgressIndicator()
-                  : Expanded(
-                      child: ListView.builder(
-                          itemCount: foodList.length,
-                          itemBuilder: (context, index) {
-                            FoodItem foodItem = FoodItem(
-                              title: foodList[index].title,
-                              kitchen: foodList[index].kitchen,
-                              imagePath: foodList[index].imagePath,
-                              category: foodList[index].category,
-                              ingredients: foodList[index].ingredients,
-                              preparation: foodList[index].preparation,
-                            );
-                            return FoodListCard(
-                              foodItem: foodItem,
-                            );
-                          }),
-                    )
-        ],
+              ],
+            ),
+            DividerV2(),
+            noRusluts
+                ? Text(
+                    'لا توجد نتائج للبحث',
+                    style: TextStyle(fontSize: 16, color: black),
+                  )
+                : searching
+                    ? CircularProgressIndicator()
+                    : Expanded(
+                        child: ListView.builder(
+                            itemCount: foodList.length,
+                            itemBuilder: (context, index) {
+                              FoodItem foodItem = FoodItem(
+                                title: foodList[index].title,
+                                kitchen: foodList[index].kitchen,
+                                imagePath: foodList[index].imagePath,
+                                category: foodList[index].category,
+                                ingredients: foodList[index].ingredients,
+                                preparation: foodList[index].preparation,
+                              );
+                              return FoodListCard(
+                                foodItem: foodItem,
+                              );
+                            }),
+                      )
+          ],
+        ),
       ),
     );
   }

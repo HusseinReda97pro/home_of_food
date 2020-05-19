@@ -8,8 +8,7 @@ import 'package:home_of_food/widgets/app_drawer/app_drawer.dart';
 import 'package:home_of_food/widgets/appbar.dart';
 import 'package:provider/provider.dart';
 
-class FoodList extends StatelessWidget {
-
+class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<MainModel>(builder: (context, model, chlild) {
@@ -18,7 +17,7 @@ class FoodList extends StatelessWidget {
         appBar: MainAppBar(
           context: context,
         ),
-        body: model.loadingCategory
+        body: model.loadingFavorits
             ? Transform.rotate(
                 angle: 9.43,
                 child: ListSkeleton(
@@ -32,17 +31,15 @@ class FoodList extends StatelessWidget {
                 ),
               )
             : ListView.builder(
-                itemCount: model.selectedCategoryItems.length,
+                itemCount: model.favoritesItems.length,
                 itemBuilder: (context, index) {
                   FoodItem foodItem = FoodItem(
-                    title: model.selectedCategoryItems[index]['title'],
-                    kitchen: model.selectedCategoryItems[index]['kitchen'],
-                    imagePath: model.selectedCategoryItems[index]['image_path'],
-                    category: model.selectedCategoryItems[index]['category'],
-                    ingredients: model.selectedCategoryItems[index]
-                        ['ingredients'],
-                    preparation: model.selectedCategoryItems[index]
-                        ['preparation'],
+                    title: model.favoritesItems[index].title,
+                    kitchen: model.favoritesItems[index].kitchen,
+                    imagePath: model.favoritesItems[index].imagePath,
+                    category: model.favoritesItems[index].category,
+                    ingredients: model.favoritesItems[index].ingredients,
+                    preparation: model.favoritesItems[index].preparation,
                   );
                   return FoodListCard(
                     foodItem: foodItem,

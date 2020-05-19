@@ -1,10 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:home_of_food/data/Palette.dart';
+import 'package:home_of_food/models/helpers/check_internet.dart';
 import 'package:home_of_food/models/shared/main_model.dart';
+import 'package:home_of_food/pages/info/send.dart';
+import 'package:home_of_food/pages/profile/profile.dart';
 import 'package:home_of_food/widgets/app_drawer/widgets/drawer_tab.dart';
 import 'package:home_of_food/widgets/divider.dart';
 import 'package:provider/provider.dart';
+
+import '../alert_message.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -45,7 +50,8 @@ class AppDrawer extends StatelessWidget {
                 title: 'المفضلات',
                 icon: Icons.favorite,
                 onTap: () {
-                  //TODO page
+                  model.getFavorites();
+                  Navigator.pushNamed(context, '/favorits');
                 },
               ),
               DividerV2(),
@@ -53,12 +59,18 @@ class AppDrawer extends StatelessWidget {
                 title: 'وصفات الأعضاء',
                 icon: Icons.group,
                 onTap: () async {
-                  //TODO page
-                  if (model.currentUser != null) {
-                    model.getPosts();
-                    Navigator.pushNamed(context, '/users_posts');
+                  if (await checkInternet()) {
+                    if (model.currentUser != null) {
+                      model.getPosts();
+                      Navigator.pushNamed(context, '/users_posts');
+                    } else {
+                      Navigator.pushNamed(context, '/unlogedin');
+                    }
                   } else {
-                    Navigator.pushNamed(context, '/unlogedin');
+                    showAlertMessage(
+                        context: context,
+                        title: 'حدث خطًأ ما',
+                        message: 'تحقق من اتصالك بالأنترنت وحاول مرة أخرى');
                   }
                 },
               ),
@@ -66,12 +78,27 @@ class AppDrawer extends StatelessWidget {
               DrawerTab(
                 title: 'الملف الشخصي',
                 icon: Icons.person,
-                onTap: () {
-                  //TODO page
-                  if (model.currentUser != null) {
-                    Navigator.pushNamed(context, '/profile');
+                onTap: () async {
+                  if (await checkInternet()) {
+                    if (model.currentUser != null) {
+                      model.getProfilePosts(userUID: model.currentUser.userUID);
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => ProfilePage(
+                            myProfile: true,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.pushNamed(context, '/unlogedin');
+                    }
                   } else {
-                    Navigator.pushNamed(context, '/unlogedin');
+                    showAlertMessage(
+                        context: context,
+                        title: 'حدث خطًأ ما',
+                        message: 'تحقق من اتصالك بالأنترنت وحاول مرة أخرى');
                   }
                 },
               ),
@@ -80,7 +107,7 @@ class AppDrawer extends StatelessWidget {
                 title: 'حول التطبيق',
                 icon: Icons.info_outline,
                 onTap: () {
-                  //TODO page
+                  Navigator.pushNamed(context, '/about');
                 },
               ),
               DividerV2(),
@@ -88,7 +115,11 @@ class AppDrawer extends StatelessWidget {
                 title: 'الإبلاغ عن مشكلة',
                 icon: Icons.report_problem,
                 onTap: () {
-                  //TODO page
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              Send(Message.Issue)));
                 },
               ),
               DividerV2(),
@@ -96,7 +127,11 @@ class AppDrawer extends StatelessWidget {
                 title: 'إرسال رأيك في التطبيق',
                 icon: Icons.mail,
                 onTap: () {
-                  //TODO page
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              Send(Message.FeadBack)));
                 },
               ),
               DividerV2(),

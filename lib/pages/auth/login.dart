@@ -4,6 +4,8 @@ import 'package:home_of_food/models/shared/main_model.dart';
 import 'package:home_of_food/pages/auth/widgets/input_field.dart';
 import 'package:home_of_food/models/helpers/check_internet.dart';
 import 'package:home_of_food/widgets/alert_message.dart';
+import 'package:home_of_food/widgets/curve_painter_bottom.dart';
+import 'package:home_of_food/widgets/curve_painter_header.dart';
 import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
@@ -107,7 +109,7 @@ class LoginState extends State<Login> {
                                     'تسجيل الدخول عن طريق الفيس بوك',
                                     style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w600),
                                   ),
                                   Expanded(
@@ -122,8 +124,25 @@ class LoginState extends State<Login> {
                                 ],
                               ),
                               color: Color(0XFF4267B2),
-                              onPressed: () {
-                                // TODO fb login
+                              onPressed: () async {
+                                if (await checkInternet()) {
+                                  var message = await model.loginWithFB();
+                                  if (message != 'successfully') {
+                                    showAlertMessage(
+                                        context: context,
+                                        title: 'حدث خطًأ ما',
+                                        message: message);
+                                  } else {
+                                    Navigator.pushReplacementNamed(
+                                        context, '/home');
+                                  }
+                                } else {
+                                  showAlertMessage(
+                                      context: context,
+                                      title: 'حدث خطًأ ما',
+                                      message:
+                                          'تحقق من اتصالك بالأنترنت وحاول مرة أخرى');
+                                }
                               },
                             ),
                             // Google
@@ -137,7 +156,7 @@ class LoginState extends State<Login> {
                                     'تسجيل الدخول عن طريق جوجل',
                                     style: TextStyle(
                                         color: Colors.red,
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w600),
                                   ),
                                   Expanded(
@@ -152,8 +171,26 @@ class LoginState extends State<Login> {
                                 ],
                               ),
                               color: Colors.white,
-                              onPressed: () {
-                                // TODO google login
+                              onPressed: () async{
+                                 if (await checkInternet()) {
+                                  var message = await model.googleLogin();
+                                  if (message != 'successfully') {
+                                    showAlertMessage(
+                                        context: context,
+                                        title: 'حدث خطًأ ما',
+                                        message: message);
+                                  } else {
+                                    Navigator.pushReplacementNamed(
+                                        context, '/home');
+                                  }
+                                } else {
+                                  showAlertMessage(
+                                      context: context,
+                                      title: 'حدث خطًأ ما',
+                                      message:
+                                          'تحقق من اتصالك بالأنترنت وحاول مرة أخرى');
+                                }
+                                
                               },
                             ),
                             SizedBox(
@@ -199,7 +236,7 @@ class LoginState extends State<Login> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height * 0.2,
-                    child: CustomPaint(painter: CurvePainterBootom()),
+                    child: CustomPaint(painter: CurvePainterBottom()),
                   ),
                   Positioned(
                       right: MediaQuery.of(context).size.width * 0.03,
@@ -228,8 +265,7 @@ class LoginState extends State<Login> {
                                     context: context,
                                     title: 'حدث خطًأ ما',
                                     message: message);
-                              }
-                              {
+                              } else {
                                 Navigator.pushReplacementNamed(
                                     context, '/home');
                               }
@@ -241,7 +277,6 @@ class LoginState extends State<Login> {
                                       'تحقق من اتصالك بالأنترنت وحاول مرة أخرى');
                             }
                           }
-                          
                         },
                       ))
                 ],
@@ -256,57 +291,3 @@ class LoginState extends State<Login> {
     });
   }
 }
-
-class CurvePainterHeader extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint();
-    paint.color = pink;
-    paint.style = PaintingStyle.fill; // Change this to fill
-    var path = Path();
-    path.moveTo(0, size.height);
-    path.quadraticBezierTo(
-        size.width / 2, size.height, size.width, size.height * 0.25);
-    path.lineTo(size.width, 0);
-    path.lineTo(0, 0);
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-  }
-}
-
-class CurvePainterBootom extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint();
-    paint.color = pink;
-    paint.style = PaintingStyle.fill; // Change this to fill
-    var path = Path();
-    path.moveTo(size.width, 0);
-    path.quadraticBezierTo(
-        -size.width * 0.1, size.height * 0.3, 0, size.height);
-    path.lineTo(0, size.height);
-    path.lineTo(size.width, size.height);
-    // path.lineTo(0,size.height* 0.6);
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-  }
-}
-//  Container(
-//         width: MediaQuery.of(context).size.width,
-//         height: MediaQuery.of(context).size.height,
-//         // color: pink,
-//         child: SvgPicture.asset(
-//           'assets/login.svg',
-//           fit: BoxFit.scaleDown,
-//         ),
-//       ),

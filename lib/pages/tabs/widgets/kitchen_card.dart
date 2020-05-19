@@ -61,7 +61,7 @@ class KitchenCard extends StatelessWidget {
     }
   }
 
-  List<Map<String, dynamic>> cats = [];
+  final List<Map<String, dynamic>> cats = [];
 
   @override
   Widget build(BuildContext context) {
@@ -128,9 +128,7 @@ class KitchenCard extends StatelessWidget {
                           // imagePath: 'assets/placeholder_image.png',
                         ),
                         onTap: () {
-                          //   // TODO get kitien data to show
-                          // var categoryItems =
-                          //     selectCategory(kitchenTitile, title);
+                          
                           model.selectCategory(
                               category: categories[index], kitchen: title);
                           Navigator.push(

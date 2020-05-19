@@ -23,19 +23,36 @@ class PostsPageState extends State<PostsPage> {
         appBar: MainAppBar(
           context: context,
         ),
-        body: model.loadingPosts ?
-        Transform.rotate(
-          angle: 9.43,
-          child: ListSkeleton(
-            style: SkeletonStyle(
-              theme: SkeletonTheme.Light,
-              isShowAvatar: false,
-              barCount: 3,
-              colors: [Color(0xffcccccc), pink, Color(0xff333333)],
-              isAnimation: true,
+        body: model.loadingPosts
+            ? Transform.rotate(
+                angle: 9.43,
+                child: ListSkeleton(
+                  style: SkeletonStyle(
+                    theme: SkeletonTheme.Light,
+                    isShowAvatar: false,
+                    barCount: 3,
+                    colors: [Color(0xffcccccc), pink, Color(0xff333333)],
+                    isAnimation: true,
+                  ),
+                ),
+              )
+            : PostList(
+                posts: model.posts,
+              ),
+        floatingActionButton: Container(
+          margin: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.78),
+          child: FloatingActionButton(
+            backgroundColor: blue,
+            hoverColor: pink,
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
             ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/add_item');
+            },
           ),
-        ):PostList(posts: model.posts,),
+        ),
       );
     });
   }

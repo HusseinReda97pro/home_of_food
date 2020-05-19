@@ -28,7 +28,6 @@ dependencies:
   flutter_launcher_icons: ^0.7.3
   firebase_core: ^0.4.3+1
   firebase_auth: ^0.15.3
-  # cloud_firestore: ^0.13.0+1
   firebase_database: ^3.1.1
   shared_preferences: ^0.5.3+4
   image_picker: ^0.6.5+3
@@ -36,6 +35,15 @@ dependencies:
   flutter_spinkit: ^4.1.2+1
   http: ^0.12.1
   flutter_skeleton: ^0.1.0+1
+  flutter_facebook_login: ^3.0.0
+  google_sign_in: ^4.4.4
+  share: ^0.6.4+1
+  url_launcher: ^5.4.7
+  firebase_admob: ^0.9.3+2
+
+
+
+
 
 
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">home of food</string>
+
+   .<string name="facebook_app_id">277366376631232</string>
+<string name="fb_login_protocol_scheme">fb277366376631232</string>
+
+</resources>
+

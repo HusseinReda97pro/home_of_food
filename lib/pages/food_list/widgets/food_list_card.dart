@@ -1,11 +1,23 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:home_of_food/data/Palette.dart';
+import 'package:home_of_food/data/ads.dart';
 import 'package:home_of_food/models/food_item.dart';
 import 'package:home_of_food/pages/food_item/food_item.dart';
 
 class FoodListCard extends StatelessWidget {
   final FoodItem foodItem;
   FoodListCard({this.foodItem});
+  InterstitialAd createInterstitialAd() {
+    return InterstitialAd(
+      adUnitId: 'ca-app-pub-9506840191616541/8491859925',
+      // adUnitId: InterstitialAd.testAdUnitId,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("InterstitialAd event is $event");
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,27 +93,22 @@ class FoodListCard extends StatelessWidget {
                 ),
               ),
             ),
-
-            //  ClipOval(
-            //   // TODO hanel ofline
-            //   child: Image.network(
-            // 'https://firebasestorage.googleapis.com/v0/b/home-of-food.appspot.com/o/food_imges%2F' +
-            //     imagePath.split('/')[imagePath.split('/').length - 1] +
-            //     '?alt=media',
-            //     width: 60,
-            //     fit: BoxFit.cover,
-
-            //   ),
-            // ),
           ),
         ],
       ),
       onTap: () {
+
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (BuildContext context) =>
-                    FoodItemPage(foodItem: foodItem)));
+                    FoodItemPage(foodItem: foodItem))).whenComplete(() {
+          try {
+            createInterstitialAd()
+              ..load()
+              ..show();
+          } catch (_) {}
+        });
       },
     );
   }

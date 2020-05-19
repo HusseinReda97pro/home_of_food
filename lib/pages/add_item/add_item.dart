@@ -14,10 +14,10 @@ import 'package:home_of_food/widgets/appbar.dart';
 import 'package:home_of_food/widgets/columnbuilder/columnbuilder.dart';
 import 'package:home_of_food/widgets/divider.dart';
 import 'package:home_of_food/widgets/ensure_visible.dart.dart';
+import 'package:home_of_food/widgets/loading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:home_of_food/models/helpers/check_internet.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AddItem extends StatefulWidget {
   @override
@@ -128,7 +128,7 @@ class AddItemState extends State<AddItem> {
     return Container(
       margin: EdgeInsets.only(right: 3.0),
       height: 40,
-      width: MediaQuery.of(context).size.width * 0.7,
+      width: MediaQuery.of(context).size.width * 0.63,
       child: EnsureVisibleWhenFocused(
         focusNode: focusNode,
         child: TextField(
@@ -150,38 +150,6 @@ class AddItemState extends State<AddItem> {
         ),
       ),
     );
-  }
-
-  void loading(contextm, message) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            titlePadding: EdgeInsets.all(0.0),
-            content: Container(
-              width: 150,
-              height: 100,
-              child: Column(
-                children: <Widget>[
-                  SpinKitChasingDots(
-                    color: pink,
-                    size: 50.0,
-                  ),
-                  SizedBox(
-                    height: 5.0,
-                  ),
-                  Text(
-                    message,
-                    style: TextStyle(
-                        color: pink, fontSize: 16, fontWeight: FontWeight.w500),
-                  )
-                ],
-              ),
-            ),
-          );
-        });
   }
 
   @override
@@ -267,7 +235,7 @@ class AddItemState extends State<AddItem> {
                           side: BorderSide(color: black)),
                       child: Container(
                         height: 25,
-                        width: MediaQuery.of(context).size.width * 0.4,
+                        width: MediaQuery.of(context).size.width * 0.45,
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
                             iconEnabledColor: pink,
@@ -350,10 +318,6 @@ class AddItemState extends State<AddItem> {
                   ),
                 ),
                 DividerV2(),
-                // FlatButton(child: Text('test'),onPressed: ()async{
-                //  String imageLink =  await uploadImage(foodImage);
-                //  print(imageLink);
-                // },),
                 // المقادير
                 Container(
                   margin: EdgeInsets.all(10.0),
@@ -433,6 +397,9 @@ class AddItemState extends State<AddItem> {
                               hint: 'أضف مقدار',
                               controller: ingredientsController,
                               focusNode: ingredientsFocusNode,
+                            ),
+                            Expanded(
+                              child: SizedBox(),
                             ),
                             Container(
                               margin: EdgeInsets.only(right: 3.0),
@@ -537,6 +504,9 @@ class AddItemState extends State<AddItem> {
                               controller: preparationController,
                               focusNode: preparationFocusNode,
                             ),
+                            Expanded(
+                              child: SizedBox(),
+                            ),
                             Container(
                               margin: EdgeInsets.only(right: 3.0),
                               child: RoundedButton(
@@ -605,35 +575,35 @@ class AddItemState extends State<AddItem> {
                           title: " بيانات ناقصة!!",
                           message: 'قم بإختيار المطبخ');
                     } else if (selectedCategory == 'التصنيف') {
-                                              Navigator.pop(context);
+                      Navigator.pop(context);
 
                       showAlertMessage(
                           context: context,
                           title: " بيانات ناقصة!!",
                           message: 'قم بإختيار التصنيف');
                     } else if (titleController.text.isEmpty) {
-                                              Navigator.pop(context);
+                      Navigator.pop(context);
 
                       showAlertMessage(
                           context: context,
                           title: " بيانات ناقصة!!",
                           message: 'قم بإدخال أسم الوصفة');
                     } else if (foodImage == null) {
-                                              Navigator.pop(context);
+                      Navigator.pop(context);
 
                       showAlertMessage(
                           context: context,
                           title: " بيانات ناقصة!!",
                           message: 'قم بإدخال صورة');
                     } else if (ingredients.length == 0) {
-                                              Navigator.pop(context);
+                      Navigator.pop(context);
 
                       showAlertMessage(
                           context: context,
                           title: " بيانات ناقصة!!",
                           message: 'قم بإدخال المقادير');
                     } else if (preparation.length == 0) {
-                                              Navigator.pop(context);
+                      Navigator.pop(context);
 
                       showAlertMessage(
                           context: context,

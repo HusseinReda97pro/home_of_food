@@ -6,8 +6,11 @@ import '../post.dart';
 mixin PostsModel on ChangeNotifier {
   bool loadingPosts = false;
   List<Post> posts = [];
+  List<Post> profilePosts = [];
+  bool loadingProfile;
+  int totalLieks = 0;
 
-  void getPosts() async {
+  Future<void> getPosts() async {
     loadingPosts = true;
     notifyListeners();
     var data = FirebaseDatabase.instance.reference().child("users_posts");
@@ -23,8 +26,6 @@ mixin PostsModel on ChangeNotifier {
         } else {
           likedLIst = [];
         }
-        print(value['likedList']);
-        print(likedLIst);
         Post post = Post(
             postID: key,
             title: value['title'],
@@ -40,6 +41,25 @@ mixin PostsModel on ChangeNotifier {
       });
     });
     loadingPosts = false;
+    notifyListeners();
+  }
+
+  void getProfilePosts({@required userUID}) async {
+    loadingProfile = true;
+    notifyListeners();
+    totalLieks = 0;
+    profilePosts.clear();
+    // if(posts.length == 0){
+      await getPosts();
+    // }
+    for (Post post in posts) {
+      if (post.userUID == userUID) {
+        totalLieks += post.likedList.length;
+        profilePosts.add(post);
+      }
+    }
+
+    loadingProfile = false;
     notifyListeners();
   }
 
@@ -70,7 +90,7 @@ mixin PostsModel on ChangeNotifier {
         .child('likedList')
         .child(userUID)
         .remove();
-    
+
     // FirebaseDatabase.instance
     //     .reference()
     //     .child("users_posts")

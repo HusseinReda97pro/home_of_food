@@ -11,7 +11,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: <Widget>[
           Expanded(child: SizedBox()),
           Text(
-            'Hom of food',
+            'Home of food',
             style: TextStyle(color: lightBlue, fontSize: 24),
           ),
           Expanded(child: SizedBox()),
