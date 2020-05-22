@@ -178,7 +178,10 @@ mixin UserModel on ChangeNotifier {
             'fbLink': null
           };
           database.reference().child('users').child(user.uid).set(userData);
-          socialLogin(userUID: user.uid, email: user.email);
+          socialLogin(
+              userUID: user.uid,
+              email: user.email,
+              displayuserName: user.displayName);
           message = 'successfully';
         } catch (error) {
           switch (error.code) {
@@ -213,8 +216,15 @@ mixin UserModel on ChangeNotifier {
           final token = result.accessToken.token;
           final facebookAuthCred =
               FacebookAuthProvider.getCredential(accessToken: token);
+          // final graphResponse = await http.get(
+          //     'https://graph.facebook.com/v2.12/me?fields=name,picture,email&access_token=$token');
+          // final profile = json.decode(graphResponse.body);
+
           var user = (await _auth.signInWithCredential(facebookAuthCred)).user;
-          socialLogin(userUID: user.uid, email: user.email);
+          socialLogin(
+              userUID: user.uid,
+              email: user.email,
+              displayuserName: user.displayName);
           message = 'successfully';
         } catch (error) {
           switch (error.code) {
@@ -256,7 +266,10 @@ mixin UserModel on ChangeNotifier {
         'fbLink': null
       };
       database.reference().child('users').child(user.uid).set(userData);
-      socialLogin(userUID: user.uid, email: user.email);
+      socialLogin(
+          userUID: user.uid,
+          email: user.email,
+          displayuserName: user.displayName);
       message = 'successfully';
     } catch (error) {
       message = 'حدث خطأ غير معروف';
@@ -280,7 +293,10 @@ mixin UserModel on ChangeNotifier {
         idToken: googleAuth.idToken,
       );
       var user = (await _auth.signInWithCredential(googleAuthCred)).user;
-      socialLogin(userUID: user.uid, email: user.email);
+      socialLogin(
+          userUID: user.uid,
+          email: user.email,
+          displayuserName: user.displayName);
       message = 'successfully';
     } catch (error) {
       message = 'حدث خطأ غير معروف';
@@ -292,15 +308,40 @@ mixin UserModel on ChangeNotifier {
   }
 
 // login for google and facebook to save user data in shared prefrances and modle
-  socialLogin({@required userUID, @required email}) async {
+  socialLogin(
+      {@required userUID, @required email, @required displayuserName}) async {
     String userName, fbLink;
-    var db =
-        FirebaseDatabase.instance.reference().child("users").child(userUID);
-    await db.once().then((DataSnapshot snapshot) {
-      Map<dynamic, dynamic> values = snapshot.value;
-      userName = values['userName'];
-      fbLink = values['fbLink'];
+
+    bool exist;
+    await FirebaseDatabase.instance
+        .reference()
+        .child("users")
+        .child(userUID)
+        .once()
+        .then((DataSnapshot snapshot) {
+      if (snapshot.value == null) {
+        exist = false;
+      } else {
+        exist = true;
+      }
     });
+    if (exist) {
+      var db =
+          FirebaseDatabase.instance.reference().child("users").child(userUID);
+      await db.once().then((DataSnapshot snapshot) {
+        Map<dynamic, dynamic> values = snapshot.value;
+        userName = values['userName'];
+        fbLink = values['fbLink'];
+      });
+    } else {
+      userName = displayuserName;
+      FirebaseDatabase database = FirebaseDatabase.instance;
+      Map<String, String> userData = {'userName': userName, 'fbLink': null};
+      database.reference().child('users').child(userUID).set(userData);
+    }
+    // print('display : '+ displayuserName);
+    // print('userName : '+ userName);
+
     currentUser = User(
         userUID: userUID, email: email, userName: userName, fbLink: fbLink);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -333,10 +374,8 @@ mixin UserModel on ChangeNotifier {
   Future<void> getFBLink(userUID) async {
     String fbLink;
     try {
-      var db = FirebaseDatabase.instance
-          .reference()
-          .child('users')
-          .child(userUID);
+      var db =
+          FirebaseDatabase.instance.reference().child('users').child(userUID);
       await db.once().then((DataSnapshot snapshot) {
         Map<dynamic, dynamic> values = snapshot.value;
         fbLink = values['fbLink'];

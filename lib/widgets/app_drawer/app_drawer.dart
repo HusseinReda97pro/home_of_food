@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:home_of_food/data/Palette.dart';
 import 'package:home_of_food/models/helpers/check_internet.dart';
@@ -112,16 +113,15 @@ class AppDrawer extends StatelessWidget {
               ),
               DividerV2(),
               DrawerTab(
-                title: 'الإبلاغ عن مشكلة',
-                icon: Icons.report_problem,
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              Send(Message.Issue)));
-                },
-              ),
+                  title: 'الإبلاغ عن مشكلة',
+                  icon: Icons.report_problem,
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                Send(Message.Issue)));
+                  }),
               DividerV2(),
               DrawerTab(
                 title: 'إرسال رأيك في التطبيق',
